@@ -1,0 +1,31 @@
+{
+  "name": "wiki-node",
+  "version": "1.0.0",
+  "description": "wiki-vue3 backend api",
+  "main": "server.ts",
+  "scripts": {
+    "dev": "nodemon -e ts -w ./ -x npm run start-nodemon",
+    "start-nodemon": "tsc && node build/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wiki",
+    "express",
+    "api"
+  ],
+  "author": "jiatln",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.1.2",
+    "ts-node": "^10.4.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/express": "^4.17.13",
+    "@types/jsonwebtoken": "^8.5.6",
+    "@types/mongoose": "^5.11.97"
+  }
+}
