@@ -1,8 +1,18 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
-import { Request, Response } from 'express';
 import userRouter from './routes/user';
+import spaceRouter from './routes/space';
+import isAuth from './middleware/isAuth';
+
+declare global {
+  namespace Express {
+    interface Request {
+      isAuth?: Boolean;
+      userId?: string;
+    }
+  }
+}
 
 const app = express();
 const port = 2022;
@@ -20,11 +30,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!');
-});
+app.use(isAuth);
 
 app.use('/user', userRouter);
+app.use('/space', spaceRouter);
 
 mongoose
   .connect(

@@ -66,8 +66,7 @@ userRouter.post('/register', async (req: Request, res: Response) => {
     password: hashedPassword,
   });
   // 保存用户
-  const result = await newUser.save();
-  console.log(result);
+  await newUser.save();
   res.send({
     code: 200,
     msg: '注册成功',
