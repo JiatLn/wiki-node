@@ -2,34 +2,35 @@ import mongoose from 'mongoose';
 import { ISpace } from './space';
 import { IUser } from './user';
 
-export interface IPage extends mongoose.Document {
-  name: string;
+export interface INote extends mongoose.Document {
+  title: string;
   content: string;
-  creator: IUser;
+  author: IUser;
   space: ISpace;
   createAt: Date;
   updateAt: Date;
+  isPublished: Boolean;
+  isDeleted: Boolean;
 }
 
-export const PageSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  code: {
+export const NoteSchema = new mongoose.Schema({
+  title: {
     type: String,
     required: true,
   },
   content: {
     type: String,
+    required: true,
   },
-  creator: {
+  author: {
     type: mongoose.Types.ObjectId,
     ref: 'User',
+    required: true,
   },
   space: {
     type: mongoose.Types.ObjectId,
     ref: 'Space',
+    required: true,
   },
   createAt: {
     type: Date,
@@ -39,7 +40,14 @@ export const PageSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  isPublished: {
+    type: Boolean,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const Page = mongoose.model<IPage>('Page', PageSchema);
-export default Page;
+const Note = mongoose.model<INote>('Note', NoteSchema);
+export default Note;

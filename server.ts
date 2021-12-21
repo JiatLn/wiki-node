@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import userRouter from './routes/user';
 import spaceRouter from './routes/space';
 import isAuth from './middleware/isAuth';
+import noteRouter from './routes/note';
 
 declare global {
   namespace Express {
@@ -34,6 +35,7 @@ app.use(isAuth);
 
 app.use('/user', userRouter);
 app.use('/space', spaceRouter);
+app.use('/note', noteRouter);
 
 mongoose
   .connect(

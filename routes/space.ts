@@ -1,6 +1,6 @@
 import { ISpace } from './../models/space';
 import express, { Request, Response } from 'express';
-import Page from '../models/page';
+import Note from '../models/note';
 import Space from '../models/space';
 import User from '../models/user';
 
@@ -22,7 +22,13 @@ spaceRouter.post('/', async (req: Request, res: Response) => {
     creator: req.userId,
   });
   // 保存
-  await newSpace.save();
+  let result = await newSpace.save();
+  // 更新
+  await User.findByIdAndUpdate(req.userId, {
+    $push: {
+      spaces: result.id,
+    },
+  });
   res.send({
     code: 200,
     msg: '知识库创建成功',
@@ -38,12 +44,12 @@ spaceRouter.get('/list', async (req: Request, res: Response) => {
       data: null,
     });
   }
-  const { pageSize, pageNum } = req.params;
+  const { pageSize, pageNum } = req.query;
   const total = (await Space.find()).length;
   Space.find({})
     .limit(Number(pageSize) || 10)
     .populate({ path: 'creator', model: User, select: 'username' })
-    .populate({ path: 'pages', model: Page })
+    .populate({ path: 'notes', model: Note })
     .then(spaces => {
       let rows = [];
       rows = spaces.map((item: ISpace) => {
@@ -51,7 +57,8 @@ spaceRouter.get('/list', async (req: Request, res: Response) => {
           name: item.name,
           creator: item.creator.username,
           updateAt: item.updateAt,
-          pageCount: item.pages.length,
+          noteCount: item.notes.length,
+          sid: item._id,
         };
       });
       res.send({
@@ -61,6 +68,27 @@ spaceRouter.get('/list', async (req: Request, res: Response) => {
           rows: rows,
           total: total,
         },
+      });
+    });
+});
+
+spaceRouter.get('/', async (req: Request, res: Response) => {
+  if (!req.isAuth) {
+    res.send({
+      code: 403,
+      msg: '用户认证失败！',
+      data: null,
+    });
+  }
+  const { sid } = req.query;
+  Space.findOne({ _id: sid })
+    .populate({ path: 'creator', model: User, select: 'username' })
+    .populate({ path: 'notes', model: Note })
+    .then(space => {
+      res.send({
+        code: 200,
+        msg: '',
+        data: space,
       });
     });
 });

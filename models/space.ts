@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { IPage } from './page';
+import { INote } from './note';
 import { IUser } from './user';
 
 export interface ISpace extends mongoose.Document {
@@ -7,7 +7,7 @@ export interface ISpace extends mongoose.Document {
   code: string;
   description?: string;
   creator: IUser;
-  pages: IPage[];
+  notes: INote[];
   createAt: Date;
   updateAt: Date;
 }
@@ -28,10 +28,10 @@ export const SpaceSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'User',
   },
-  pages: [
+  notes: [
     {
       type: mongoose.Types.ObjectId,
-      ref: 'Page',
+      ref: 'Note',
     },
   ],
   createAt: {
