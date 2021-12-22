@@ -38,7 +38,9 @@ noteRouter.post('/', async (req: Request, res: Response) => {
   res.send({
     code: 200,
     msg: '笔记创建成功',
-    data: null,
+    data: {
+      nid: result.id
+    },
   });
 });
 
@@ -50,10 +52,9 @@ noteRouter.get('/list', async (req: Request, res: Response) => {
       data: null,
     });
   }
-  const { pageSize, pageNum, space } = req.query;
+  const { space } = req.query;
   const total = (await Note.find({ space: space })).length;
   Note.find({ space: space })
-    .limit(Number(pageSize) || 10)
     .populate({ path: 'author', model: User, select: 'username' })
     .then(notes => {
       let rows = [];
@@ -63,6 +64,7 @@ noteRouter.get('/list', async (req: Request, res: Response) => {
           author: item.author.username,
           updateAt: item.updateAt,
           nid: item._id,
+          isPublished: item.isPublished,
         };
       });
       res.send({
@@ -91,9 +93,45 @@ noteRouter.get('/', async (req: Request, res: Response) => {
       res.send({
         code: 200,
         msg: '',
-        data: note,
+        data: note
       });
     });
 });
+
+noteRouter.delete('/', async (req: Request, res: Response) => {
+  if (!req.isAuth) {
+    res.send({
+      code: 403,
+      msg: '用户认证失败！',
+      data: null,
+    });
+  }
+  const { nid } = req.query;
+  console.log(nid);
+  let note = await Note.findById(nid);
+  let authorId = note?.author._id.toHexString()
+  if (!note?.id) {
+    res.send({
+      code: 400,
+      msg: '该数据不存在',
+      data: null
+    })
+  } else if (authorId !== req.userId) {
+    res.send({
+      code: 403,
+      msg: '只有作者才能删除该笔记',
+      data: null,
+    });
+  } else {
+    await Note.findByIdAndRemove(nid)
+    // TODO 删除User和Space中的Note记录
+    res.send({
+      code: 200,
+      msg: '删除成功！',
+      data: null
+    })
+  }
+
+})
 
 export default noteRouter;

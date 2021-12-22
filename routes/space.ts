@@ -85,10 +85,18 @@ spaceRouter.get('/', async (req: Request, res: Response) => {
     .populate({ path: 'creator', model: User, select: 'username' })
     .populate({ path: 'notes', model: Note })
     .then(space => {
+      let data = {
+        sid: space._id,
+        name: space.name,
+        code: space.code,
+        description: space.description,
+        creator: space.creator.username,
+        noteCount: space.notes.length,
+      }
       res.send({
         code: 200,
         msg: '',
-        data: space,
+        data: data
       });
     });
 });
