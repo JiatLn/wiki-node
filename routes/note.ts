@@ -12,6 +12,7 @@ noteRouter.post('/', async (req: Request, res: Response) => {
       msg: '用户认证失败！',
       data: null,
     });
+    return
   }
 
   const { title, content, isPublished, space } = req.body as INote;
@@ -51,6 +52,7 @@ noteRouter.get('/list', async (req: Request, res: Response) => {
       msg: '用户认证失败！',
       data: null,
     });
+    return
   }
   const { space } = req.query;
   const total = (await Note.find({ space: space })).length;
@@ -85,6 +87,7 @@ noteRouter.get('/', async (req: Request, res: Response) => {
       msg: '用户认证失败！',
       data: null,
     });
+    return
   }
   const { nid } = req.query;
   Note.findOne({ _id: nid })
@@ -105,9 +108,9 @@ noteRouter.delete('/', async (req: Request, res: Response) => {
       msg: '用户认证失败！',
       data: null,
     });
+    return
   }
   const { nid } = req.query;
-  console.log(nid);
   let note = await Note.findById(nid);
   let authorId = note?.author._id.toHexString()
   if (!note?.id) {

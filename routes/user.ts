@@ -13,37 +13,45 @@ userRouter.get('/login', (req, res: Response) => {
 
 userRouter.post('/login', async (req: Request, res: Response) => {
   const { username, password } = req.body;
-  const user = await User.findOne({
-    username: username,
-  });
-  const isEqual = await bcrypt.compare(password, user?.password as string);
-  if (!user || !isEqual) {
-    res.send({
-      code: 400,
-      msg: '用户名或密码错误',
+  try {
+    const user = await User.findOne({
+      username: username,
     });
-    return;
+    const isEqual = await bcrypt.compare(password, user?.password ?? '');
+    if (!user || !isEqual) {
+      res.send({
+        code: 400,
+        msg: '用户名或密码错误',
+      });
+      return;
+    }
+    // 生成token
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        username: user.username,
+      },
+      'somesupersecretkey',
+      {
+        expiresIn: '24h',
+      },
+    );
+    res.send({
+      code: 200,
+      msg: '登录成功',
+      data: {
+        token,
+        username: user.username,
+        id: user.id,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.send({
+      code: 500,
+      msg: '未知的错误发生了~',
+    });
   }
-  // 生成token
-  const token = jwt.sign(
-    {
-      userId: user.id,
-      username: user.username,
-    },
-    'somesupersecretkey',
-    {
-      expiresIn: '24h',
-    },
-  );
-  res.send({
-    code: 200,
-    msg: '登录成功',
-    data: {
-      token,
-      username: user.username,
-      id: user.id,
-    },
-  });
 });
 
 userRouter.post('/register', async (req: Request, res: Response) => {

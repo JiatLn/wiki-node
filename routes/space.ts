@@ -13,6 +13,7 @@ spaceRouter.post('/', async (req: Request, res: Response) => {
       msg: '用户认证失败！',
       data: null,
     });
+    return
   }
   const { name, code, description } = req.body;
   const newSpace = new Space({
@@ -43,6 +44,7 @@ spaceRouter.get('/list', async (req: Request, res: Response) => {
       msg: '用户认证失败！',
       data: null,
     });
+    return
   }
   const { pageSize, pageNum } = req.query;
   const total = (await Space.find()).length;
@@ -79,6 +81,7 @@ spaceRouter.get('/', async (req: Request, res: Response) => {
       msg: '用户认证失败！',
       data: null,
     });
+    return
   }
   const { sid } = req.query;
   Space.findOne({ _id: sid })
